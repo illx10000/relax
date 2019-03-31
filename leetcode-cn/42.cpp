@@ -11,59 +11,76 @@ using namespace std;
 #include <set>
 #include <string>
 #include <sstream>
-using std::set;
-using std::stringstream;
-
-//https://www.cnblogs.com/ECJTUACM-873284962/p/6935506.html
-//参考基数排序
 
 class Solution {
 public:
+    int trap(vector<int>& height) {
+		if(height.size() <= 2)	return 0;
+
+		int l = 0, r = height.size()-1;
+		while( l < r && height[l] == 0 ) l++;
+		while( r > l && height[r] == 0 ) r--;
+		
+		if( l >= r)	return 0;
+
+		//cout << l << "," << r << endl;
+
+		return calcArea(l,r,height);	
+			
+    }
+
 	
-	int replace(vector<int>& nums,int index)
+	int calcArea(int l,int r, vector<int>& height) //calc area of [l-r]
 	{
-		//(假设index上的数nums[index]，则应该将这个数set到num的 （nums[index]-1)的位置上)
-		//例如a[1] = 3; 这应该将a[3-1]设置为3，如果a[3-1]非法直接换，否则需要先换 3-1的位置
-		//
+		if(l + 1 >= r) return 0;
+		
+		const int INVALID_VALUE_CURR = -1;
+		vector<int> maxHeightIndex; //store indeces of the number has max height
 
-		int next_index	= nums[index] - 1;
-		int next_n		= nums[ next_index ];
+	 	int maxHeight = INVALID_VALUE_CURR;
 
-		if( next_n <= 0 || next_n > nums.size() )//待替换的位置是非法数直接替换；
+		for(size_t i = l+1; i < r; ++i)
 		{
-			swap(nums[index], nums[ next_index ]); 
+			if(height[i]>maxHeight)
+			{
+				maxHeightIndex.clear();
+				maxHeightIndex.push_back(i);
+				maxHeight = height[i];
+			}
+			else if(height[i] == maxHeight)
+			{
+				maxHeightIndex.push_back(i);
+			}
 		}
-		else //先要将该位置上合法的数替换掉
-		{
-			if( nums[next_index] == next_index + 1 ) return index; //过滤重复
 
-			int cur_num = nums[index];
-			nums[index] = 0; //先标记为非法的数字,避免死循环
-			int last_index = replace( nums, next_index  ); //下一个非法数索引的位置
-			nums[last_index] = cur_num; //恢复
+		//cout << "l:" << l << "\nr:" << r << "\nmaxHeight:" << maxHeight << endl << endl;
+
+		if(maxHeight < std::min(height[l],height[r]) ) //edge 
+		{
+			return calcAreaReal(l,r,height);
 		}
-		return index; //next_index的值是OK的，空缺是index
+
+		int area = 0;
+		area += calcArea(l,  maxHeightIndex[0], height);
+		area += calcArea(maxHeightIndex[maxHeightIndex.size()-1],  r, height);
+		for(size_t i = 0; i < maxHeightIndex.size() - 1; i++)
+		{
+			area += calcAreaReal(maxHeightIndex[i],maxHeightIndex[i+1],height);
+		}
+		return area;
 	}
 
-    int firstMissingPositive(vector<int>& nums) {
-		int n_size = nums.size();
+	int calcAreaReal(int l,int r, vector<int>& height)
+	{
+		int area = 0;
+		int minHeightInLR = std::min( height[l], height[r]);
 
-		for (int i = 0; i < n_size; i++)
+		for(int i = l+1; i < r; i++)
 		{
-			//int cur_num = nums[i];
-			if( nums[i] == i+1 )	continue;
-			else if( nums[i] <= 0 || nums[i] > nums.size() ) continue; 
-			else replace(nums,i);	
-			
+			area += (minHeightInLR- height[i]); 
 		}
-		
-		int k = 0;
-		for (; k < (int)nums.size(); k++)
-		{
-			if(nums[k] != k +1) break;
-		}
-		return k+1;
-    }
+		return area;
+	}
 };
 
 template<typename T>
@@ -100,7 +117,7 @@ int main(int argc,char** argv)
 
     //int a[]={1,8,6,2,5,4,8,3,7};
     //int a[]={-1, 0, 1, 2, -1, -4};
-    int a[]={1,2,-1};
+    int a[]={0,1,0,2,1,0,1,3,2,1,2,1};
     //int b[]={2,3,4};
 
     vector<int> va(a,a+sizeof(a)/sizeof(a[0]));
@@ -110,7 +127,7 @@ int main(int argc,char** argv)
     Solution sssss;
 	//cout << (
 	
-	cout  << sssss.firstMissingPositive(va) << endl;
+	cout  << sssss.trap(va) << endl;
 		//) << endl;
 	//printVector(va);
 
