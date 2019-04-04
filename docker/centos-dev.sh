@@ -14,8 +14,8 @@ yum install sudo gcc gcc-c++ wget curl cmake gdb vim
 #input Y to confirm
 
 #install go env
-wget -c https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz
-tar -C /usr/local/ -zxvf go1.8.3.linux-amd64.tar.gz
+wget -c https://dl.google.com/go/go1.12.1.linux-amd64.tar.gz
+tar -C /usr/local/ -zxvf go1.12.1.linux-amd64.tar.gz
 
 echo 'export PATH=$PATH:/usr/local/go/bin/' >> /etc/profile
 mkdir -p /code/go/
@@ -32,5 +32,5 @@ docker rm  $containerID
 
 
 
-docker run -it -v --privileged /Users/luoxi/Desktop:code centos-dev /bin/sh
+docker run -it --privileged -v /Users/luoxi/Desktop:/code/ centos-dev /bin/sh
 source /etc/profile

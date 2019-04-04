@@ -43,14 +43,14 @@ public:
     void rotate(vector<vector<int> >& matrix) {
         if(matrix.size() <= 1)  return;
 
-        int n    = matrix.size()-1;
-        
-        
-            for(int i = 0; i < n ; i++)
+        int max_rotate_size = matrix.size() / 2;
+        int n = matrix.size() - 1;
+        for(int i = 0; i < max_rotate_size; i++)
+        {
+            int inner_size = matrix.size() - i * 2 - 1;
+            for(int j = i; j < inner_size + i ; j++)
             {
-                for(int  j = i; j < loop; j++)
-                {
-                    
+                /* code */
                     int LL = matrix[i][j]; //保存左上角的数据
                     
 
@@ -58,11 +58,9 @@ public:
                     matrix[n-j][i]          = matrix[n-i][n-j];
                     matrix[n-i][n-j]        =  matrix[j][n-i];
                     matrix[j][n-i]          = LL;
-
-                    //printT(matrix); cout << endl;
-                }
             }
-
+            
+        }
     }
 };
 
@@ -92,7 +90,7 @@ int main(int argc,char** argv)
 
 
     vector< vector<int> > ss ;
-    const int N = 4;
+    const int N = 3;
 
     for(int i = 0; i < N; i++)
     {
