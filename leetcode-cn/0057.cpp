@@ -66,7 +66,9 @@ public:
         }
 
         //std::sort(intervals.begin(), intervals.end(), [](const Interval& l, const Interval& r){return l.start < r.start;});
-
+        //[A1,A2] [B1,B2] [C1,C2] ,需要插入 [D1,D2]
+        
+        //case1  [D2<A1] ==> [D1,D2] [A1,A2] [B1,B2] [C1,C2]
         if(intervals[0].start > newInterval.end) //比当前区间都小
         {
             result.resize(intervals.size() + 1);
@@ -75,6 +77,7 @@ public:
             return result;
         }
 
+        //case2  [D2==A1] ==> [D1,A2] [B1,B2] [C1,C2]
         else if(intervals[0].start == newInterval.end) //可以合并到第一个区间
         {
             result.swap(intervals);
@@ -82,6 +85,7 @@ public:
             return result;
         }
 
+        //case3 [C2<D1] ==> [A1,A2] [B1,B2] [C1,C2] [D1,D2]
         if(intervals[intervals.size()-1].end < newInterval.start) //比所有区间都大
         {
             result.swap(intervals);
@@ -89,6 +93,7 @@ public:
             return result;
         }
 
+        //case4 [C2==D1] ==> [A1,A2] [B1,B2] [C1,D2]
         else if(intervals[intervals.size()-1].end == newInterval.start)
         {
             result.swap(intervals);
@@ -96,52 +101,32 @@ public:
             return result;
         }
 
-        if(intervals[0].start > newInterval.start && intervals[intervals.size()-1].end < newInterval.end)
+        //case5 贯穿
+        else if(newInterval.start <= intervals[0].start  && newInterval.end >= intervals[intervals.size()-1].end)
         {
             result.push_back(newInterval);
             return result;
         }
 
-        int low = -1, high = -1, lresult = -1, hresult = -1;
+        
         for(size_t i = 0; i < intervals.size(); i++)
         {
-            if( intervals[i].start  <=  newInterval.start && 
-                intervals[i].end    >=  newInterval.start)
+            if(intervals[i].start > newInterval.end || intervals[i].end < newInterval.start ) //不相交
             {
-                low = i;
-            }
-            if( intervals[i].start  <=  newInterval.end && 
-                intervals[i].end    >= newInterval.end)
-            {
-                high = i;
-            }
-        }
-
-        if(low != -1 && high != -1)
-        {
-            for(size_t i = 0 ; i < low; i++)
-            { 
                 result.push_back(intervals[i]);
             }
-
-            result.push_back(Interval(intervals[low].start,intervals[high].end));
-
-            for(size_t i = high + 1 ; i < intervals.size(); i++)
-            { 
-                result.push_back(intervals[i]);
+            else
+            {
+                if(intervals[i].start < newInterval.start) newInterval.start = intervals[i].start;
+                if(intervals[i].end   > newInterval.end)   newInterval.end   = intervals[i].end;
             }
-        }
-        else
-        {
-            result.swap(intervals);
-            if(low != -1) result[low].end = newInterval.end; 
-            if(high!= -1) result[high].start = newInterval.start;
+            
         }
         
-        //cout << low << "," << high << endl;
-
         
-
+        result.push_back(newInterval);
+        
+        sort(result.begin(),result.end(),[](const Interval& a,const Interval&b){return a.start < b.start;});
         return result;
     }
 };
@@ -188,12 +173,14 @@ int main(int argc,char** argv)
 	//cout << sssss.canJump(va) << endl;
 	//printVector(vb);
     vector<Interval> v;
-    //v.push_back(Interval(-1,0));
-    v.push_back(Interval(1,5));
+    v.push_back(Interval(1,3));
+    //v.push_back(Interval(0,5));
+    //v.push_back(Interval(9,12));
+    v.push_back(Interval(6,9));
     //v.push_back(Interval(6,9));
     //v.push_back(Interval(10,11));
 
-    printVInterval(sssss.insert(v,Interval(0,6)));
+    printVInterval(sssss.insert(v,Interval(2,5)));
 
 	//printT(sssss.removeDuplicates(va));
 }
