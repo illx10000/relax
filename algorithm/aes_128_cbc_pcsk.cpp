@@ -1,9 +1,9 @@
 #include "aes_128_cbc_pcsk.h"
+#include <cassert>
+
 using namespace relax;
 
-#define KEYLENBIT	128 //秘钥长度bit
-#define ROUND		10  //10次普通轮加密
-#define BLOCKLEN	16	//每16byte也就是128bit作为一个Block
+
 
 static const uint8_t sbox[256] = {
   //0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
@@ -44,11 +44,34 @@ static const uint8_t rsbox[256] = {
 
 //加密上下文
 
-struct ctx
+int aes_128_cbc_pcsk::initctx(aes_128_ctx& ctx,const uint8_t* iv,const uint8_t* key)
 {
-	uint8_t iv[BLOCKLEN]; //初始化向量
-	uint8_t expandKey[];
-};
+	assert( key && strlen((const char*)key) == AES128_BLOCKLEN);
+	assert( iv  && strlen((const char*)iv)  == AES128_BLOCKLEN);
+
+
+	memcpy(ctx.iv, iv, AES128_BLOCKLEN);
+	uint8_t* w = ctx.keyExpansions;
+	uint8_t  t[4]; //可以使用uint32_t来替换
+
+	//step1. 初始轮扩展秘钥与原始秘钥相同16 byte
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			w[i*4+j] = key[i*4+j]; 
+		}
+	} 
+
+	//step2. 其他轮的初始化
+	for (int i = ; i < length; i++)
+	{
+
+	}
+
+
+}
+
 
 int aes_128_cbc_pcsk::encrypt(const string& strIn,const string& strIv,const string& strKey)
 {

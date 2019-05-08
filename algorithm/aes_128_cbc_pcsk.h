@@ -1,8 +1,9 @@
 /*
-* usage: 实现aes-128-cbc-pc加密基本原理
+* usage: 实现aes-128-cbc-pc加密基本原理，不可用于生产环节，生产环节请使用openssl或其他
 * 参考：https://github.com/kokke/tiny-AES-c (代码)
-*       https://www.sohu.com/a/200488301_478315 (原理)
-*		https://blog.csdn.net/qq_28205153/article/details/55798628 (原理)
+*       https://www.sohu.com/a/200488301_478315 
+*		https://blog.csdn.net/qq_28205153/article/details/55798628 
+*		https://github.com/matt-wu/AES
 */
 
 /*
@@ -34,12 +35,26 @@
 #include <string>
 using std::string;
 
+#define AES128_KEYLENBIT		128 //秘钥长度bit
+#define AES128_ROUND			10  //10次普通轮加密
+#define AES128_BLOCKLEN			16	//每16byte也就是128bit作为一个Block
+#define AES128_KEYEXPANSIONS	176 //一共有176位的扩展字节;
+
+
 namespace relax
 {
+	struct aes_128_ctx
+	{
+		uint8_t iv[AES128_BLOCKLEN];					//初始化向量
+		uint8_t keyExpansions[AES128_KEYEXPANSIONS];	//aes扩展秘钥
+	};
+
+
 	class aes_128_cbc_pcsk
 	{
-		static int encrypt(const string& strIn,const string& strIv,const string& strKey);
-		static int decrypt(const string& strIn,const string& strIv,const string& strKey);
+		static int initctx (aes_128_ctx& ctx,const uint8_t* iv,const uint8_t* key);
+		static int encrypt (const aes_128_ctx& ctx,uint8_t* buff,uint32_t bufflen);
+		static int decrypt (const aes_128_ctx& ctx,uint8_t* buff,uint32_t bufflen);
 	};
 }
 
