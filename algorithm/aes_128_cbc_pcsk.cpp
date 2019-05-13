@@ -1,6 +1,9 @@
 #include "aes_128_cbc_pcsk.h"
-#include <cassert>
 
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 using namespace relax;
 
 
@@ -42,43 +45,93 @@ static const uint8_t rsbox[256] = {
   0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
   0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d };
 
+static const uint32_t rcon[] = {
+    0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000,
+    0x1b000000, 0x36000000, 0x6c000000, 0xd8000000, 0xab000000, 0xed000000, 0x9a000000
+};
+
 //加密上下文
+//密钥编排 https://zhuanlan.zhihu.com/p/41716899
+
+uint32_t s(uint32_t s)
+{
+    return ( (sbox[ s & 0xFF000000 ] )         |
+             (sbox[ s & 0x00FF0000 ] )         |
+             (sbox[ s & 0x0000FF00 ] )         |
+             (sbox[ s & 0x000000FF ] )        
+    );
+}
+
+uint32_t g(uint32_t wi, uint32_t rc)
+{
+   return (s( wi << 8 | (wi >> 24 ) ) ^ rc);
+}
+
+
+
 
 int aes_128_cbc_pcsk::initctx(aes_128_ctx& ctx,const uint8_t* iv,const uint8_t* key)
 {
-	assert( key && strlen((const char*)key) == AES128_BLOCKLEN);
-	assert( iv  && strlen((const char*)iv)  == AES128_BLOCKLEN);
+	if( !key || strlen((const char*)key) == AES128_BLOCKLEN)
+  {
+     return -1;
+  }
+	if( iv  && strlen((const char*)iv)  == AES128_BLOCKLEN)
+  {
+    return -2;
+  }
 
 
 	memcpy(ctx.iv, iv, AES128_BLOCKLEN);
-	uint8_t* w = ctx.keyExpansions;
-	uint8_t  t[4]; //可以使用uint32_t来替换
 
-	//step1. 初始轮扩展秘钥与原始秘钥相同16 byte
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			w[i*4+j] = key[i*4+j]; 
-		}
-	} 
+  uint32_t* w = (uint32_t*)ctx.keyExpansions;
+  for(int i = 0 ; i < 4; i++)
+  {
+    w[i] = *((uint32_t*)key[i*4]);
+  }
 
-	//step2. 其他轮的初始化
-	for (int i = ; i < length; i++)
-	{
+  for (int i = 1; i < 11; i++) //后面10轮
+  {
+    w[4*i]        = w[4*i-4] ^ g(w[4*i-1],rcon[i]);
+    w[4*i + 1]    = w[4*i-3] ^ w[4*i];
+    w[4*i + 2]    = w[4*i-2] ^ w[4*i+1];
+    w[4*i + 3]    = w[4*i-1] ^ w[4*i+2];
+  }
+  
+}
 
-	}
+//密钥加法层
+uint16_t key_addition(uint16_t block)
+{
 
+}
+
+//
+uint16_t shift_rows(uint16_t block)
+{
 
 }
 
 
-int aes_128_cbc_pcsk::encrypt(const string& strIn,const string& strIv,const string& strKey)
+
+uint16_t encrypt_block(const aes_128_ctx& ctx, uint16_t block)
 {
-	if (strIv.size() != BLOCKLEN)
-	{
-		return -1; //CBC模式的初始化向量必须是128bit的
-	}
+
+}
+
+int aes_128_cbc_pcsk::encrypt(const aes_128_ctx& ctx,uint8_t* buff,uint32_t bufflen)
+{
+  //如果仅仅实现aes128的话，可以使用uint16_t的类型，其他的密钥长度无法使用
+  uint16_t* key = (uint16_t*)ctx.keyExpansions;
+  
+  for (size_t i = 0; i < bufflen; i += AES128_BLOCKLEN) //分块加密
+  {
+    uint16_t& curBlock = *(uint16_t*)(buff+i);
+
+    curBlock = encrypt_block(ctx, curBlock); //in-place encrypt
+    
+  }
+   
 
 
 }
