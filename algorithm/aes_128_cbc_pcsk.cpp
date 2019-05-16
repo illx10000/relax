@@ -129,16 +129,69 @@ void shift_rows(uint8_t *state)
 	}
 }
 
+//有限域GF(2^8)内的乘法
+
+//乘以2在有限域GF(2^8)的结果
+//https://blog.csdn.net/luotuo44/article/details/41645597
+//m(x) = [m(x) – x^8] = x^4 + x^3 +x +1
+uint8_t xtime(uint8_t x)
+{
+	return ((x << 1) ^ ((x & 0x80) ? 0x1b : 0x00)); //0x1b = (11011)2, 0x80 = (10000000)
+}
+
+//3*7=(x+1)*(x^2+x+1)=x*x^2+x*x+x+x^2+x+1=x^3+1=(1001)2 = 9 
+//https://github.com/kokke/tiny-AES-c/blob/master/aes.c
+//这个好懂一些，递归调用，虽然效率不高
+uint8_t multiply(uint8_t x, uint8_t y) 
+{
+	return (((y & 1) * x) ^
+		((y>>1 & 1) * xtime(x)) ^
+		((y>>2 & 1) * xtime(xtime(x))) ^
+		((y>>3 & 1) * xtime(xtime(xtime(x)))) ^
+		((y>>4 & 1) * xtime(xtime(xtime(xtime(x)))))); /* this last call to xtime() can be omitted */
+}
+
+
+//4*4阶矩阵相乘
+//传入uint8_t[16]的数组
+
+void matrix_multi(uint8_t* l, uint8_t *r, uint8_t* result )
+{
+	const int N = 4;
+	for (int i = 0; i < N; i++) //第i行
+	{
+		for (int j = 0; j < N; j++) //第j列
+		{
+			result[i*N+j] = 0;
+
+			for(int k = 0; k < N ;k++)
+			{
+				result[i*N+j] ^= multiply(l[i*N+k],r[k*N+j]);
+			}
+		}
+	}
+}
+
 void mix_columns(uint8_t *state)
 {
-	uint8_t temp[16] = {0};
+	uint8_t result[AES128_BLOCKLEN] = {0};
+	
+	uint8_t l[AES128_BLOCKLEN] = {
+		2,3,1,1, 
+		1,2,3,1,
+		1,1,2,3,
+		3,1,1,2
+	};
 
+	matrix_multi(l, state, result);
+
+	memcpy( state, result, sizeof(result));
 }
 
 //block中有128bit
 void encrypt_block(const aes_128_ctx& ctx, uint8_t* block)
 {
-	uint8_t state[16] = {0};
+	uint8_t state[AES128_BLOCKLEN] = {0};
 
 	//round 0. addroundkey
 	add_round_key((uint8_t*)state, (uint8_t*)ctx.keyExpansions);
@@ -146,19 +199,22 @@ void encrypt_block(const aes_128_ctx& ctx, uint8_t* block)
 	for(int i = 1; i < 10; i++)
 	{
 		//sub_byte
-
+		sub_byte(state);
+		shift_rows(state);
+		mix_columns(state);
+		add_round_key(state, (uint8_t*)(ctx.keyExpansions + 16 * i));
 	}
+	shift_rows(state);
+	mix_columns(state);
+	add_round_key(state, (uint8_t*)(ctx.keyExpansions + 160));
+
+	memcpy(block, state, AES128_BLOCKLEN);
 }
 
 int aes_128_cbc_pcsk::encrypt(const aes_128_ctx& ctx,uint8_t* buff,uint32_t bufflen)
 {
-	
-
 	for (size_t i = 0; i < bufflen; i += AES128_BLOCKLEN) //分块加密
 	{
 		encrypt_block(ctx, buff + i); //in-place encrypt
 	}
-
-
-
 }

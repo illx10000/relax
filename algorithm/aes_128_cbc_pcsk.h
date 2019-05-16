@@ -5,6 +5,9 @@
 *		https://blog.csdn.net/qq_28205153/article/details/55798628 
 *		https://github.com/matt-wu/AES
 *       https://zhuanlan.zhihu.com/p/41716899
+*       https://blog.csdn.net/bupt073114/article/details/27382533
+*       https://blog.csdn.net/luotuo44/article/details/41645597
+*		http://staff.ustc.edu.cn/~huangwc/crypto/4.pdf
 */
 
 /*
