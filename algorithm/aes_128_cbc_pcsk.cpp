@@ -50,8 +50,8 @@ static const uint32_t rcon[] = {
 	0x1b000000, 0x36000000, 0x6c000000, 0xd8000000, 0xab000000, 0xed000000, 0x9a000000
 };
 
-//¼ÓÃÜÉÏÏÂÎÄ
-//ÃÜÔ¿±àÅÅ https://zhuanlan.zhihu.com/p/41716899
+//åŠ å¯†ä¸Šä¸‹æ–‡
+//å¯†é’¥ç¼–æ’ https://zhuanlan.zhihu.com/p/41716899
 
 uint32_t s(uint32_t s)
 {
@@ -90,7 +90,7 @@ int aes_128_cbc_pcsk::initctx(aes_128_ctx& ctx,const uint8_t* iv,const uint8_t* 
 		w[i] = *((uint32_t*)key[i*4]);
 	}
 
-	for (int i = 1; i < 11; i++) //ºóÃæ10ÂÖ
+	for (int i = 1; i < 11; i++) //åé¢10è½®
 	{
 		w[4*i]        = w[4*i-4] ^ g(w[4*i-1],rcon[i]);
 		w[4*i + 1]    = w[4*i-3] ^ w[4*i];
@@ -129,11 +129,11 @@ void shift_rows(uint8_t *state)
 	}
 }
 
-//ÓĞÏŞÓòGF(2^8)ÄÚµÄ³Ë·¨
+//æœ‰é™åŸŸGF(2^8)å†…çš„ä¹˜æ³•
 
-//³ËÒÔ2ÔÚÓĞÏŞÓòGF(2^8)µÄ½á¹û
+//ä¹˜ä»¥2åœ¨æœ‰é™åŸŸGF(2^8)çš„ç»“æœ
 //https://blog.csdn.net/luotuo44/article/details/41645597
-//m(x) = [m(x) ¨C x^8] = x^4 + x^3 +x +1
+//m(x) = [m(x) â€“ x^8] = x^4 + x^3 +x +1
 uint8_t xtime(uint8_t x)
 {
 	return ((x << 1) ^ ((x & 0x80) ? 0x1b : 0x00)); //0x1b = (11011)2, 0x80 = (10000000)
@@ -141,7 +141,7 @@ uint8_t xtime(uint8_t x)
 
 //3*7=(x+1)*(x^2+x+1)=x*x^2+x*x+x+x^2+x+1=x^3+1=(1001)2 = 9 
 //https://github.com/kokke/tiny-AES-c/blob/master/aes.c
-//Õâ¸öºÃ¶®Ò»Ğ©£¬µİ¹éµ÷ÓÃ£¬ËäÈ»Ğ§ÂÊ²»¸ß
+//è¿™ä¸ªå¥½æ‡‚ä¸€äº›ï¼Œé€’å½’è°ƒç”¨ï¼Œè™½ç„¶æ•ˆç‡ä¸é«˜
 uint8_t multiply(uint8_t x, uint8_t y) 
 {
 	return (((y & 1) * x) ^
@@ -152,15 +152,15 @@ uint8_t multiply(uint8_t x, uint8_t y)
 }
 
 
-//4*4½×¾ØÕóÏà³Ë
-//´«Èëuint8_t[16]µÄÊı×é
+//4*4é˜¶çŸ©é˜µç›¸ä¹˜
+//ä¼ å…¥uint8_t[16]çš„æ•°ç»„
 
 void matrix_multi(uint8_t* l, uint8_t *r, uint8_t* result )
 {
 	const int N = 4;
-	for (int i = 0; i < N; i++) //µÚiĞĞ
+	for (int i = 0; i < N; i++) //ç¬¬iè¡Œ
 	{
-		for (int j = 0; j < N; j++) //µÚjÁĞ
+		for (int j = 0; j < N; j++) //ç¬¬jåˆ—
 		{
 			result[i*N+j] = 0;
 
@@ -188,7 +188,7 @@ void mix_columns(uint8_t *state)
 	memcpy( state, result, sizeof(result));
 }
 
-//blockÖĞÓĞ128bit
+//blockä¸­æœ‰128bit
 void encrypt_block(const aes_128_ctx& ctx, uint8_t* block)
 {
 	uint8_t state[AES128_BLOCKLEN] = {0};
@@ -213,7 +213,7 @@ void encrypt_block(const aes_128_ctx& ctx, uint8_t* block)
 
 int aes_128_cbc_pcsk::encrypt(const aes_128_ctx& ctx,uint8_t* buff,uint32_t bufflen)
 {
-	for (size_t i = 0; i < bufflen; i += AES128_BLOCKLEN) //·Ö¿é¼ÓÃÜ
+	for (size_t i = 0; i < bufflen; i += AES128_BLOCKLEN) //åˆ†å—åŠ å¯†
 	{
 		encrypt_block(ctx, buff + i); //in-place encrypt
 	}

@@ -2,26 +2,26 @@
 
 using relax::CXor;
 
-uint32_t CXor::U32_DEFAULT_KEY = 0x123;		//ÈÎÒâkey
-uint64_t CXor::U64_DEFAULT_KEY = 0x123456;	//ÈÎÒâkey
+uint32_t CXor::U32_DEFAULT_KEY = 0x123;		//ä»»æ„key
+uint64_t CXor::U64_DEFAULT_KEY = 0x123456;	//ä»»æ„key
 
-// ¼ÙÉèvalue = AB£¬ÆäÖĞAÊÇvalueµÄ¸ß32Î»£¬BÊÇvalueµÄµÍ32Î»
-// ±ê¼Çopaque64Îªf
+// å‡è®¾value = ABï¼Œå…¶ä¸­Aæ˜¯valueçš„é«˜32ä½ï¼ŒBæ˜¯valueçš„ä½32ä½
+// æ ‡è®°opaque64ä¸ºf
 
-// ÄÇÃ´Õ¹¿ªº¯Êı
+// é‚£ä¹ˆå±•å¼€å‡½æ•°
 // convert64(value) = ( B ^ f( A ^ f(B) ) ) << 32 + A ^ f(B)
-// ¼ÙÉènewValue = convert64(value)£¬ÆäÖĞnewValue = CD£¬Í¬ÉÏCÎª¸ß32Î»ÖÃ£¬DÎªµÍ32Î»
-// convert64(newValue) = ( D ^ f( C ^ f(D) ) ) << 32 + C ^ f(D)£»Í¬ÉÏ
+// å‡è®¾newValue = convert64(value)ï¼Œå…¶ä¸­newValue = CDï¼ŒåŒä¸ŠCä¸ºé«˜32ä½ç½®ï¼ŒDä¸ºä½32ä½
+// convert64(newValue) = ( D ^ f( C ^ f(D) ) ) << 32 + C ^ f(D)ï¼›åŒä¸Š
 
-// ÒòÎª C = ( B ^ f( A ^ f(B) ) ) , D = (A ^ f(B))
+// å› ä¸º C = ( B ^ f( A ^ f(B) ) ) , D = (A ^ f(B))
 // convert64(newValue) = ((A^f(B))^f((B^f(A^f(B)))^f((A^f(B)))))<<32+(B^f(A^f(B)))^f((A^f(B)))
-// ¼ÙÉèE = ((A^f(B))^f((B^f(A^f(B)))^f((A^f(B))))), F=(B^f(A^f(B)))^f((A^f(B)))
+// å‡è®¾E = ((A^f(B))^f((B^f(A^f(B)))^f((A^f(B))))), F=(B^f(A^f(B)))^f((A^f(B)))
 // E = ((A^f(B))^f((B^f(A^f(B)))^f((A^f(B)))))
-//   = A^ f(B)^ f(B^f(A^f(B))^f(A^f(B)))		//½áºÏÂÉ
-//   = A^ f(B)^ f(B)							//×Ô·´ĞÔ
-//   = A										//×Ô·´ĞÔ
+//   = A^ f(B)^ f(B^f(A^f(B))^f(A^f(B)))		//ç»“åˆå¾‹
+//   = A^ f(B)^ f(B)							//è‡ªåæ€§
+//   = A										//è‡ªåæ€§
 
-// F=(B^f(A^f(B)))^f((A^f(B))) = B //Òì»ò¾ßÓĞ×Ô·´ĞÔ
+// F=(B^f(A^f(B)))^f((A^f(B))) = B //å¼‚æˆ–å…·æœ‰è‡ªåæ€§
 
 //convert(convert(value)) = convert(convert(AB)) = convert64(newValue) = EF = AB
 
@@ -36,7 +36,7 @@ uint64_t CXor::convert64(const uint64_t value,uint64_t key64)
 
 uint64_t CXor::opaque64( uint64_t value,uint64_t key64)
 {
-	value = (( value ^ key64)+0x7669) * 0xEAAB121; //ÈÎÒâµÄÁ½¸öÊı£¬³Ë»ı²»ÒªÒç³ö¾ÍºÃ
+	value = (( value ^ key64)+0x7669) * 0xEAAB121; //ä»»æ„çš„ä¸¤ä¸ªæ•°ï¼Œä¹˜ç§¯ä¸è¦æº¢å‡ºå°±å¥½
 	return (value >> (value & 0xF)) & UINT32_MAX;
 }
 
@@ -50,6 +50,6 @@ uint32_t CXor::convert32(uint32_t value, uint32_t key32 )
 
 uint32_t CXor::opaque32(uint32_t value, uint32_t key32)
 {
-	value = (( value ^ key32)+0x79) * 0xE121; //ÈÎÒâµÄÁ½¸öÊı£¬³Ë»ı²»ÒªÒç³ö¾ÍºÃ
+	value = (( value ^ key32)+0x79) * 0xE121; //ä»»æ„çš„ä¸¤ä¸ªæ•°ï¼Œä¹˜ç§¯ä¸è¦æº¢å‡ºå°±å¥½
 	return (value >> (value & 0x7)) & UINT16_MAX;
 }
