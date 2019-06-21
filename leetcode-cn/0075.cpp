@@ -74,41 +74,23 @@ void printVV(vector<vector<int> >& v)
 
 class Solution {
 public:
-    bool searchMatrix(vector<vector<int>>& matrix, int target) {
-        if (matrix.empty() || matrix[0].empty())
+    void sortColors(vector<int>& nums) {
+        int counter[3] = { 0 };
+        for (size_t i = 0; i < nums.size(); i++)
         {
-            return false;
-        }
-        
-        int rows = matrix.size();
-        int cols = matrix[0].size();
-
-        if(target < matrix[0][0] || target > matrix[rows-1][cols-1])
-        {
-            return false;
+            counter[nums[i]]++;
         }
 
-        int row_l = 0, row_h = rows - 1;
-
-        while (row_l <= row_h) //[30,40] --> 31 => 0,0
+        int base = 0;
+        for (size_t i = 0; i < 3; i++)
         {
-            int row_middle = (row_l + row_h) / 2;
-            if ( matrix[row_middle][0] == target )
+            for (size_t j = 0; i < counter[i]; i++)
             {
-                return true;
+                nums[base + j] = i;
             }
-            else if( target < matrix[row_middle][0] ) //target应该在上半部分
-            {
-                row_h = row_middle - 1;
-            }
-            else
-            {
-                row_l = row_middle + 1;
-            }
-        } 
-        
-        // 此时row_l应该是upper_bound
-        return binary_search(matrix[row_l-1].begin(),matrix[row_l-1].end(), target);
+            base += counter[i];
+            
+        }
     }
 };
 
