@@ -100,98 +100,54 @@ void printT(TreeNode* root)
 
 }
 
-#if 0
+
+
 class Solution {
 public:
-	vector<int> majorityElement(vector<int>& nums) {
-		vector<int> result;
+	vector<int> productExceptSelf(vector<int>& nums) {
+		vector<int> v1,v2,result;
+
 		if (nums.empty())
 		{
 			return result;
 		}
-
-		int topA = nums[0], topB = nums[0], countA = 0, countB = 0;
 		
-		for (size_t i = 0; i < nums.size(); i++)
+
+		v1.push_back(nums[0]);
+		for (int i = 1; i < nums.size(); i++)
 		{
-			if (nums[i] == topA)
-			{
-				countA++;
-				continue;
-			}
-			if (nums[i] == topB)
-			{
-				countB++;
-				continue;
-			}
-
-			if (countA == 0)
-			{
-				topA = nums[i];
-				countA++;
-				continue;
-			}
-
-			if (countB == 0)
-			{
-				topB = nums[i];
-				countB++;
-				continue;
-			}
-
-			countA--;
-			countB--;
+			v1.push_back(nums[i] * v1.back());
 		}
 
-		countA = countB = 0;
-		for (size_t i = 0; i < nums.size(); i++)
+		v2.resize(nums.size());
+		v2[v2.size()-1] = nums.back();
+
+		for (int i = nums.size() - 2; i >= 0; i--)
 		{
-			if (nums[i] == topA)
-			{
-				countA++;
-			}
-			else if (nums[i] == topB)
-			{
-				countB++;
-			}
+			v2[i] = v2[i+1] * nums[i];
 		}
 
-		if (countA > nums.size() / 3)
-		{
-			result.push_back(topA);
-		}
-		if (countB > nums.size() / 3)
-		{
-			result.push_back(topB);
-		}
-		return result;
-	}
-};
-#endif
+		printT(v1);
+		printT(v2);
 
-class Solution {
-public:
-
-	vector<int> majorityElement(vector<int>& nums) {
-		vector<int> v;
-		unordered_set<int> s;
-
-		if (nums.empty())
-		{
-			return v;
-		}
-
-		int flow = nums.size() / 3;
-		unordered_map<int, int> mp;
+		result.resize(nums.size());
 		for (int i = 0; i < nums.size(); i++)
 		{
-			if (++mp[nums[i]] > flow && s.find(nums[i]) == s.end())
+			if (i == 0)
 			{
-				v.push_back(nums[i]);
-				s.insert(nums[i]);
+				result[i] = v2[1];
+			}
+			else if (i == nums.size() - 1)
+			{
+				result[i] = v1[nums.size()-2];
+			}
+			else
+			{
+				result[i] = v1[i-1] * v2[i+1]; 
 			}
 		}
-		return v;
+
+		return result;
 	}
 };
 
@@ -208,7 +164,7 @@ int main(int argc, char** argv)
 	//int a[]={-1, 0, 1, 2, -1, -4};
 	//int a[]={2,1,2};
 	//int a[]={2,1,5,6,100000,3};
-	int a[] = { 1,1,1,3,3,2,2,2 };
+	int a[] = { 1,2,3,4 };
 	int b[] = { 9,15,7,20,3 };
 
 
@@ -224,7 +180,7 @@ int main(int argc, char** argv)
 		{4,1,8,3}
 	};
 
-	auto r = s.majorityElement(va);
+	auto r = s.productExceptSelf(va);
 	//auto r = s.majorityElement(va);
 	//auto r = FindIdx(a,0, );
 
