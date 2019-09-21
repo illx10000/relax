@@ -240,8 +240,9 @@ public:
 				pBeginPrev->next = pEndCurr;
 				pBeginCurr->next = pEndNext;
 
-				cnt = 0;
 				
+				cnt = 0;
+
 			}
 		} while (true);
 		
