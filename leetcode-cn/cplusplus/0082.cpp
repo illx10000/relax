@@ -159,93 +159,36 @@ void printList(ListNode* head)
 class Solution {
 public:
 
-	//[head, tail)翻转
-	//https://blog.csdn.net/feliciafay/article/details/6841115
-	ListNode* reverseResursive(ListNode* head, ListNode* tail)
-	{
-		if (head == tail || head->next == tail)
-		{
-			return head;
-		}
-
-		ListNode* temp = reverseResursive(head->next, tail);
-		head->next->next = head;
-		head->next = NULL;
-		return temp;
-	}
-
-	ListNode* reverse(ListNode* head, ListNode* tail)
-	{
-		if (head == tail || head->next == tail)
-		{
-			return head;
-		}
-
-		ListNode* prev = head;
-		ListNode* curr = head->next;
-		ListNode* next = NULL;
-
-		while (curr != tail)
-		{
-			next = curr->next;
-			curr->next = prev;
-			prev = curr;
-			curr = next;
-		}
-		head->next = tail;
-		return prev;
-	}
-
-	ListNode* reverseKGroup(ListNode* head, int k)
-	{
-		if (k < 2 || head == NULL || head->next == NULL)
-		{
-			return head;
-		}
-
+	ListNode* deleteDuplicates(ListNode* head) {
 		ListNode* dummyHead = new ListNode(-1);
-		ListNode* pBeginPrev = dummyHead;
-		ListNode* pBeginCurr = head;
-		pBeginPrev->next = pBeginCurr;
+		dummyHead->next = head;
 
-		ListNode* pEndCurr = head;
-		ListNode* pEndNext = head;
+		ListNode* curr = head;
+		ListNode* prev = dummyHead;
 
-		//假设列表 为1->2->3->4->5->->6->7，其中k为3，
-		//每一个分组计算需要保存4个指针，[1,2,3]为一个分组，需要保存 pBeginPrev 指向1前面的元素，pBeginCur指向1, pEndCur指向3，pEndNext指向3后面的元素
-		//每一次翻转之后，需要重新串联
-
-		do
+		ListNode* t = head;
+		map<int,int> cnt;
+		while (t)
 		{
-			int cnt = 0;
+			cnt[t->val]++;
+			t = t->next;
+		}
 
-			while (cnt < k && pEndNext)
+		while (curr)
+		{
+			if (cnt[curr->val] > 1)
 			{
-				cnt++;
-				pEndCurr = pEndNext;
-				pEndNext = pEndNext->next;
+				prev->next = curr->next;
+				ListNode* tmp = curr;
+				curr = curr->next;
+				delete tmp;
 			}
-
-			if (cnt < k)
+			else
 			{
-				break;
+				prev = curr;
+				curr = curr->next;
 			}
-
-			else //从cur到pData需要翻转[cur,pNext)
-			{
-				ListNode* tBegin = pBeginCurr;
-				ListNode* tEnd = pEndNext;
-
-				ListNode* newNode = reverse(tBegin, tEnd);
-				pBeginPrev->next = newNode;
-				
-
-				
-				pBeginPrev = pBeginCurr;//此时pBeginCurr已经是最后一个节点，也是下一次循环的上一个节点
-				pBeginCurr = pEndNext;  
-				cnt = 0;
-			}
-		} while (true);
+		}
 
 		ListNode* result = dummyHead->next;
 		delete dummyHead;
@@ -256,7 +199,8 @@ public:
 
 int main(int argc, char** argv)
 {
-	int a[] = { 1,2,3,4,5 };
+	int a[] = { 1,1,1,2,3 };
+	//int a[] = { 1,2,3,3,4,4,5 };
 	vector<int> va(a, a + sizeof(a) / sizeof(a[0]));
 	ListNode* l1 = constrctList(va);
 	printList(l1);
@@ -282,7 +226,7 @@ nodes.push_back(l3);
 */
 	Solution s;
 
-	ListNode* temp = s.reverseKGroup(l1, 3);
+	ListNode* temp = s.deleteDuplicates(l1);
 
 	printList(temp);
 

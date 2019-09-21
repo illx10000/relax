@@ -158,105 +158,57 @@ void printList(ListNode* head)
  */
 class Solution {
 public:
-
-	//[head, tail)翻转
-	//https://blog.csdn.net/feliciafay/article/details/6841115
-	ListNode* reverseResursive(ListNode* head, ListNode* tail)
+	ListNode* partition(ListNode* head, int x) 
 	{
-		if (head == tail || head->next == tail)
+		if (head == NULL)
 		{
 			return head;
 		}
 
-		ListNode* temp = reverseResursive(head->next, tail);
-		head->next->next = head;
-		head->next = NULL;
-		return temp;
-	}
+		ListNode* dummyLowHead = new ListNode(-1);		
+		ListNode* lowTail = dummyLowHead;
 
-	ListNode* reverse(ListNode* head, ListNode* tail)
-	{
-		if (head == tail || head->next == tail)
+
+		ListNode* dummyHighHead = new ListNode(-1);		
+		ListNode* highTail = dummyHighHead;
+
+		
+		ListNode* cur = head;
+		while (cur)
 		{
-			return head;
-		}
+			ListNode* next = cur->next;
 
-		ListNode* prev = head;
-		ListNode* curr = head->next;
-		ListNode* next = NULL;
-
-		while (curr != tail)
-		{
-			next = curr->next;
-			curr->next = prev;
-			prev = curr;
-			curr = next;
-		}
-		head->next = tail;
-		return prev;
-	}
-
-	ListNode* reverseKGroup(ListNode* head, int k)
-	{
-		if (k < 2 || head == NULL || head->next == NULL)
-		{
-			return head;
-		}
-
-		ListNode* dummyHead = new ListNode(-1);
-		ListNode* pBeginPrev = dummyHead;
-		ListNode* pBeginCurr = head;
-		pBeginPrev->next = pBeginCurr;
-
-		ListNode* pEndCurr = head;
-		ListNode* pEndNext = head;
-
-		//假设列表 为1->2->3->4->5->->6->7，其中k为3，
-		//每一个分组计算需要保存4个指针，[1,2,3]为一个分组，需要保存 pBeginPrev 指向1前面的元素，pBeginCur指向1, pEndCur指向3，pEndNext指向3后面的元素
-		//每一次翻转之后，需要重新串联
-
-		do
-		{
-			int cnt = 0;
-
-			while (cnt < k && pEndNext)
+			if (cur->val < x) //放入低队列
 			{
-				cnt++;
-				pEndCurr = pEndNext;
-				pEndNext = pEndNext->next;
+				lowTail->next = cur;
+				lowTail = lowTail->next;
 			}
-
-			if (cnt < k)
+			else
 			{
-				break;
+				highTail->next = cur;
+				highTail = highTail->next;
 			}
+			cur = next;
+		}
+		lowTail->next = highTail->next = NULL;
 
-			else //从cur到pData需要翻转[cur,pNext)
-			{
-				ListNode* tBegin = pBeginCurr;
-				ListNode* tEnd = pEndNext;
+		lowTail->next = dummyHighHead->next;
+		delete dummyHighHead;
 
-				ListNode* newNode = reverse(tBegin, tEnd);
-				pBeginPrev->next = newNode;
-				
-
-				
-				pBeginPrev = pBeginCurr;//此时pBeginCurr已经是最后一个节点，也是下一次循环的上一个节点
-				pBeginCurr = pEndNext;  
-				cnt = 0;
-			}
-		} while (true);
-
-		ListNode* result = dummyHead->next;
-		delete dummyHead;
+		ListNode* result = dummyLowHead->next;
+		delete dummyLowHead;
 		return result;
+		
+		//printList(dummyLowHead);
+		//printList(dummyHighHead);
 	}
 };
 
 
 int main(int argc, char** argv)
 {
-	int a[] = { 1,2,3,4,5 };
+	int a[] = { 1,4,3,2,5,2 };
+	//int a[] = { 1,2,3,3,4,4,5 };
 	vector<int> va(a, a + sizeof(a) / sizeof(a[0]));
 	ListNode* l1 = constrctList(va);
 	printList(l1);
@@ -282,7 +234,7 @@ nodes.push_back(l3);
 */
 	Solution s;
 
-	ListNode* temp = s.reverseKGroup(l1, 3);
+	ListNode* temp = s.partition(l1,3);
 
 	printList(temp);
 
