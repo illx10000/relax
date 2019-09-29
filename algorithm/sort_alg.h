@@ -12,9 +12,14 @@ public:
     
     static void mergeSortR(vector<int>& arr);
     static void mergeSort(vector<int>& arr);
+    static void mergeSortInner(vector<int>& arr, int low ,int high,vector<int>& temp);
 
     static void quickSortR(vector<int>& arr);
-    static void quickSort(vector<int>&);
+    static void quickSort(vector<int>& arr);
+
+    static void quickSortInner(vector<int>& arr,int low, int high);
+    static int  partitionInner(vector<int>& arr,int low, int high);
+
 };
 
 #endif
