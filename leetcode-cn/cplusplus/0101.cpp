@@ -96,52 +96,66 @@ void printT(vector<TreeNode*> t)
 
 class Solution {
 public:
-    int numTrees(int n) 
+    bool isSymmetric(TreeNode* root) 
+	{
+		if(root == NULL)
 		{
-			//递归超时
-			/*
-        if(n == 0)
-				{
-					 return 0;
-				}
-				return helper(1,n);
-				*/
-			 vector<long> result; //result 数组存储的是长度为 n的二叉搜索树的个数
-			 result.resize(n+2);
-			 result[0] = 1;
-			 result[1] = 1;
-
-			 //长度为i的二叉搜索树的个数应该是，长度为 [1,j-1],[j+1,n] 的二叉树积
-
-			 for(int i = 2; i <= n; i++)
-			 {
-				  for(int j = 1; j <= i; j++)
-					{
-						 result[i] += (result[j-1] * result[i-j]);
-					}
-			 }
-			 return result[n];
+			return true;
+		}
+		
+		//return isSymmetricR(root->left, root->right);
+		return isSymmetricNR(root->left, root->right);
     }
 
-		
-		int helper(int low, int high)
+	bool isSymmetricR(TreeNode* left,TreeNode* right)
+	{
+		if( (left != NULL && right == NULL) || (left == NULL && right != NULL) )
 		{
-			 int cnt = 0;
-			 if( high < low )
-			 {
-				  return 1;
-			 }
-			 else 
-			 {
-				  for(int i = low; i<= high; i++)
-					{
-						 int leftCnt = helper(low, i - 1);
-						 int rightCnt = helper(i+1, high);
-						 cnt += leftCnt*rightCnt;
-					}
-			 }
-			 return cnt;
+			return false;
 		}
+		if(left == right)
+		{
+			 return true;
+		}
+		if(left->val != right->val)
+		{
+			 return false;
+		}
+
+		return isSymmetricR(left->left, right->right) && isSymmetricR(left->right, right->left);
+	}
+	
+	bool isSymmetricNR(TreeNode* left,TreeNode* right)
+	{
+		 queue<TreeNode*> lq,rq;
+		 lq.push(left);
+		 rq.push(right);
+
+		 while(!lq.empty() && !rq.empty())
+		 {
+			 TreeNode* t1 = lq.front(); lq.pop();
+			 TreeNode* t2 = rq.front(); rq.pop();
+
+			 if(  (t1 == NULL && t2 != NULL) || (t1 != NULL && t2 == NULL) )
+			 {
+				return false;
+			 }
+			 if(t1 == t2 && t2 == NULL)
+			 {
+				continue;
+			 }
+			 
+			 if(t1->val != t2->val)
+			 {
+				 return false;
+			 }
+
+			lq.push(t1->left);  lq.push(t1->right); 
+			rq.push(t2->right); rq.push(t2->left);
+		 }
+		 return true;
+	}
+
 };
 
 int main(int argc, char** argv)
@@ -154,7 +168,7 @@ int main(int argc, char** argv)
 
 	Solution s;
 
-    auto t = s.numTrees(3);
+    auto t = s.isSymmetric(root);
 	printT(t);
 
 }

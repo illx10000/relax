@@ -96,52 +96,53 @@ void printT(vector<TreeNode*> t)
 
 class Solution {
 public:
-    int numTrees(int n) 
+	struct levelNode
+	{
+		int _level;
+		TreeNode* _node;
+		levelNode(int level, TreeNode* node):_level(level),_node(node){};
+	};
+	
+    vector<vector<int> > levelOrder(TreeNode* root) 
+	{
+		vector<vector<int> > result;
+		if(root == NULL)
 		{
-			//递归超时
-			/*
-        if(n == 0)
-				{
-					 return 0;
-				}
-				return helper(1,n);
-				*/
-			 vector<long> result; //result 数组存储的是长度为 n的二叉搜索树的个数
-			 result.resize(n+2);
-			 result[0] = 1;
-			 result[1] = 1;
-
-			 //长度为i的二叉搜索树的个数应该是，长度为 [1,j-1],[j+1,n] 的二叉树积
-
-			 for(int i = 2; i <= n; i++)
-			 {
-				  for(int j = 1; j <= i; j++)
-					{
-						 result[i] += (result[j-1] * result[i-j]);
-					}
-			 }
-			 return result[n];
-    }
-
-		
-		int helper(int low, int high)
-		{
-			 int cnt = 0;
-			 if( high < low )
-			 {
-				  return 1;
-			 }
-			 else 
-			 {
-				  for(int i = low; i<= high; i++)
-					{
-						 int leftCnt = helper(low, i - 1);
-						 int rightCnt = helper(i+1, high);
-						 cnt += leftCnt*rightCnt;
-					}
-			 }
-			 return cnt;
+			 return result;
 		}
+
+		int lastLevel = 1;
+		vector<int> curRow;
+
+		queue<levelNode> q;
+		q.push(levelNode(1,root));
+		
+
+		while(!q.empty())
+		{
+			levelNode temp = q.front(); q.pop();
+			if(temp._node == NULL)
+			{
+				continue;
+			}
+			if( lastLevel == temp._level )
+			{
+				curRow.push_back( temp._node->val );
+			}
+			else 
+			{
+				lastLevel = temp._level;
+				result.push_back(curRow);
+				curRow.clear();
+				curRow.push_back(temp._node->val);
+			}
+			q.push( levelNode(temp._level+1, temp._node->left) );
+			q.push( levelNode(temp._level+1, temp._node->right) );
+		}
+		result.push_back(curRow);
+
+		return result;
+    }
 };
 
 int main(int argc, char** argv)
@@ -154,7 +155,7 @@ int main(int argc, char** argv)
 
 	Solution s;
 
-    auto t = s.numTrees(3);
+    auto t = s.levelOrder(root);
 	printT(t);
 
 }

@@ -96,52 +96,57 @@ void printT(vector<TreeNode*> t)
 
 class Solution {
 public:
-    int numTrees(int n) 
+	struct levelNode
+	{
+		TreeNode* _node;
+		int _level;
+		levelNode(TreeNode* node, int level):_node(node),_level(level){};
+	};
+	
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) 
+	{
+		vector< vector<int> > result;
+		if(NULL == root)
 		{
-			//递归超时
-			/*
-        if(n == 0)
-				{
-					 return 0;
-				}
-				return helper(1,n);
-				*/
-			 vector<long> result; //result 数组存储的是长度为 n的二叉搜索树的个数
-			 result.resize(n+2);
-			 result[0] = 1;
-			 result[1] = 1;
-
-			 //长度为i的二叉搜索树的个数应该是，长度为 [1,j-1],[j+1,n] 的二叉树积
-
-			 for(int i = 2; i <= n; i++)
-			 {
-				  for(int j = 1; j <= i; j++)
-					{
-						 result[i] += (result[j-1] * result[i-j]);
-					}
-			 }
-			 return result[n];
-    }
-
-		
-		int helper(int low, int high)
-		{
-			 int cnt = 0;
-			 if( high < low )
-			 {
-				  return 1;
-			 }
-			 else 
-			 {
-				  for(int i = low; i<= high; i++)
-					{
-						 int leftCnt = helper(low, i - 1);
-						 int rightCnt = helper(i+1, high);
-						 cnt += leftCnt*rightCnt;
-					}
-			 }
-			 return cnt;
+			 return result;
 		}
+		
+		queue<levelNode> st;
+		vector<int> tempRow;
+		int lastlevel = 1;
+		st.push(levelNode(root,1));
+
+		while (!st.empty())
+		{
+			levelNode tempNode = st.front(); st.pop();
+			if(tempNode._node == NULL)
+			{
+				continue;
+			}
+
+			if(lastlevel == tempNode._level)
+			{
+				tempRow.push_back(tempNode._node->val);
+			}
+			else 
+			{
+				result.push_back(tempRow);
+				tempRow.clear();
+				tempRow.push_back(tempNode._node->val);
+				lastlevel = tempNode._level;
+			}
+
+			st.push(levelNode(tempNode._node->left, tempNode._level+1));
+			st.push(levelNode(tempNode._node->right,tempNode._level+1));
+		}
+		result.push_back(tempRow);
+		
+		for(int i = 1; i < result.size(); i+=2)
+		{
+			std::reverse(result[i].begin(),result[i].end());
+		}
+		return result;
+    }
 };
 
 int main(int argc, char** argv)
@@ -154,7 +159,7 @@ int main(int argc, char** argv)
 
 	Solution s;
 
-    auto t = s.numTrees(3);
+    auto t = s.zigzagLevelOrder(root);
 	printT(t);
 
 }

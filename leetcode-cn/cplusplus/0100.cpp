@@ -96,52 +96,25 @@ void printT(vector<TreeNode*> t)
 
 class Solution {
 public:
-    int numTrees(int n) 
+    bool isSameTree(TreeNode* p, TreeNode* q) 
 		{
-			//递归超时
-			/*
-        if(n == 0)
+        if(p == q)
 				{
-					 return 0;
+					 return true;
 				}
-				return helper(1,n);
-				*/
-			 vector<long> result; //result 数组存储的是长度为 n的二叉搜索树的个数
-			 result.resize(n+2);
-			 result[0] = 1;
-			 result[1] = 1;
 
-			 //长度为i的二叉搜索树的个数应该是，长度为 [1,j-1],[j+1,n] 的二叉树积
+				if( (p == NULL && q != NULL) || (q == NULL && p != NULL) )
+				{
+					 return false;
+				}
 
-			 for(int i = 2; i <= n; i++)
-			 {
-				  for(int j = 1; j <= i; j++)
-					{
-						 result[i] += (result[j-1] * result[i-j]);
-					}
-			 }
-			 return result[n];
+				if(p->val != q->val)
+				{
+					 return false;
+				}
+
+				return isSameTree(p->left,q->left) && isSameTree(p->right, q->right);
     }
-
-		
-		int helper(int low, int high)
-		{
-			 int cnt = 0;
-			 if( high < low )
-			 {
-				  return 1;
-			 }
-			 else 
-			 {
-				  for(int i = low; i<= high; i++)
-					{
-						 int leftCnt = helper(low, i - 1);
-						 int rightCnt = helper(i+1, high);
-						 cnt += leftCnt*rightCnt;
-					}
-			 }
-			 return cnt;
-		}
 };
 
 int main(int argc, char** argv)
@@ -154,7 +127,7 @@ int main(int argc, char** argv)
 
 	Solution s;
 
-    auto t = s.numTrees(3);
+    auto t = s.isSameTree(root,root);
 	printT(t);
 
 }

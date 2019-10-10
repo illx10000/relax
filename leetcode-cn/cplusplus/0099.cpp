@@ -96,52 +96,31 @@ void printT(vector<TreeNode*> t)
 
 class Solution {
 public:
-    int numTrees(int n) 
+		struct node
 		{
-			//递归超时
-			/*
-        if(n == 0)
+			TreeNode* _node;
+			int 		  _visited;
+			node(TreeNode* root, int visited):_node(root),_visited(visited){};
+		};
+
+    void recoverTree(TreeNode* root) 
+		{
+				
+        stack<node> st;
+				st.push(node(root, 0));
+				while(!st.empty())
 				{
-					 return 0;
+					 node temp = st.top();
+					 if(temp._node == NULL) 
+					 {
+						  continue;
+					 }
+					 else if(temp._visited)
+					 {
+						  
+					 }
 				}
-				return helper(1,n);
-				*/
-			 vector<long> result; //result 数组存储的是长度为 n的二叉搜索树的个数
-			 result.resize(n+2);
-			 result[0] = 1;
-			 result[1] = 1;
-
-			 //长度为i的二叉搜索树的个数应该是，长度为 [1,j-1],[j+1,n] 的二叉树积
-
-			 for(int i = 2; i <= n; i++)
-			 {
-				  for(int j = 1; j <= i; j++)
-					{
-						 result[i] += (result[j-1] * result[i-j]);
-					}
-			 }
-			 return result[n];
     }
-
-		
-		int helper(int low, int high)
-		{
-			 int cnt = 0;
-			 if( high < low )
-			 {
-				  return 1;
-			 }
-			 else 
-			 {
-				  for(int i = low; i<= high; i++)
-					{
-						 int leftCnt = helper(low, i - 1);
-						 int rightCnt = helper(i+1, high);
-						 cnt += leftCnt*rightCnt;
-					}
-			 }
-			 return cnt;
-		}
 };
 
 int main(int argc, char** argv)
@@ -154,8 +133,8 @@ int main(int argc, char** argv)
 
 	Solution s;
 
-    auto t = s.numTrees(3);
-	printT(t);
+  s.recoverTree(root);
+	printT(root);
 
 }
 
