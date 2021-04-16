@@ -8,3 +8,6 @@
 relax*
 UpgradeLog*
 *a.out
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
